@@ -84,6 +84,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
     Route::get('/calls', [\App\Http\Controllers\Admin\CallController::class, 'index'])->name('calls.index');
     Route::post('/calls/{call}/complete', [\App\Http\Controllers\Admin\CallController::class, 'complete'])->name('calls.complete');
+    Route::get('/notifications/check', [\App\Http\Controllers\Admin\NotificationController::class, 'check'])->name('notifications.check');
 });
 
 // QR Menu Routes

@@ -25,11 +25,20 @@
             --primary-color: #ff7e20;
             --primary-dark: #e66a10;
             --bg-color: #f8f9fc;
+            --bg-card: #ffffff;
             --text-main: #2d3436;
             --text-muted: #636e72;
             --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             --radius-lg: 24px;
             --radius-md: 16px;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a2e;
+            --bg-card: #16213e;
+            --text-main: #eaeaea;
+            --text-muted: #a0a0a0;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -42,11 +51,37 @@
             color: var(--text-main);
             overflow-x: hidden;
             padding-bottom: 100px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: none;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
         }
 
         /* Hero Section */
         .hero-banner {
-            background: white;
+            background: var(--bg-card);
             padding: 40px 20px 30px;
             border-radius: 0 0 var(--radius-lg) var(--radius-lg);
             text-align: center;
@@ -95,7 +130,7 @@
         }
 
         .search-wrapper {
-            background: white;
+            background: var(--bg-card);
             border-radius: var(--radius-md);
             padding: 5px 20px;
             display: flex;
@@ -111,6 +146,8 @@
             flex: 1;
             font-size: 0.95rem;
             font-weight: 500;
+            background: transparent;
+            color: var(--text-main);
         }
 
         .search-wrapper i {
@@ -135,7 +172,7 @@
             display: inline-block;
             padding: 10px 20px;
             margin: 0 8px;
-            background: white;
+            background: var(--bg-card);
             border-radius: 50px;
             font-weight: 600;
             font-size: 0.9rem;
@@ -165,7 +202,7 @@
         }
 
         .product-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: var(--radius-md);
             padding: 12px;
             margin-bottom: 15px;
@@ -175,6 +212,7 @@
             transition: transform 0.2s;
             border: 1px solid rgba(0, 0, 0, 0.01);
             position: relative;
+            cursor: pointer;
         }
 
         .product-card:active {
@@ -389,7 +427,7 @@
         }
 
         .order-status-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: var(--radius-md);
             padding: 20px;
             margin-bottom: 25px;
@@ -454,14 +492,116 @@
             color: var(--primary-color);
         }
 
-        /* ... existing footer cart styles ... */
+        /* Product Detail Modal */
+        .product-modal .modal-content {
+            background: var(--bg-card);
+            border: none;
+            border-radius: var(--radius-lg);
+        }
+
+        .product-modal .modal-header {
+            border-bottom: none;
+            padding: 20px 20px 10px;
+        }
+
+        .product-modal .modal-body {
+            padding: 20px;
+        }
+
+        .product-modal-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        .product-modal-title {
+            font-weight: 800;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .product-modal-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .product-modal-price {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .allergen-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .allergen-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 126, 32, 0.1);
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Cart Add Animation */
+        @keyframes flyToCart {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(0.5) translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .fly-animation {
+            animation: flyToCart 0.5s ease-out forwards;
+        }
+
+        .pulse-animation {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Loader Dark Mode */
         #loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
+            background: var(--bg-color);
             z-index: 9999;
             display: flex;
             align-items: center;
@@ -471,11 +611,42 @@
 </head>
 
 <body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="darkModeToggle">
+        <i class="las la-moon" id="darkModeIcon"></i>
+    </button>
+
     <div id="loader">
         <div class="spinner-grow text-warning" role="status"></div>
     </div>
 
     @yield('content')
+
+    <!-- Product Detail Modal -->
+    <div class="modal fade product-modal" id="productDetailModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalProductImage" class="product-modal-image" src="" alt="">
+                    <h3 id="modalProductName" class="product-modal-title"></h3>
+                    <p id="modalProductDesc" class="product-modal-desc"></p>
+                    <div id="modalAllergens" class="allergen-list"></div>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span id="modalProductPrice" class="product-modal-price"></span>
+                        <button id="modalAddToCart" class="add-to-cart-btn"
+                            style="width: auto; padding: 12px 25px; border-radius: 12px;">
+                            <i class="las la-cart-plus"></i> Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -483,6 +654,26 @@
     <script>
         $(window).on('load', function () {
             $('#loader').fadeOut('slow');
+        });
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+
+        if (localStorage.getItem('qrDarkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            darkModeIcon.classList.replace('la-moon', 'la-sun');
+        }
+
+        darkModeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('qrDarkMode', isDark);
+            if (isDark) {
+                darkModeIcon.classList.replace('la-moon', 'la-sun');
+            } else {
+                darkModeIcon.classList.replace('la-sun', 'la-moon');
+            }
         });
     </script>
     @stack('scripts')

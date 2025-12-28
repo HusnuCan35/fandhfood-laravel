@@ -613,6 +613,12 @@
                 </div>
 
                 <div class="header-actions">
+                    <a href="{{ route('admin.calls.index') }}" class="header-btn" id="notifBtn"
+                        style="position: relative;">
+                        <i class="las la-bell"></i>
+                        <span id="notifBadge"
+                            style="display: none; position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">0</span>
+                    </a>
                     <button class="header-btn" id="toggleDarkMode">
                         <i class="las la-moon"></i>
                     </button>
@@ -664,6 +670,35 @@
             localStorage.setItem('adminDarkMode', isDark);
             this.innerHTML = isDark ? '<i class="las la-sun"></i>' : '<i class="las la-moon"></i>';
         });
+
+        // --- NOTIFICATION SYSTEM ---
+        let lastNotifCount = 0;
+        const notifSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_c6ccf3232f.mp3');
+        notifSound.volume = 0.5;
+
+        function checkNotifications() {
+            fetch('{{ route("admin.notifications.check") }}')
+                .then(res => res.json())
+                .then(data => {
+                    const $badge = document.getElementById('notifBadge');
+                    if (data.total > 0) {
+                        $badge.style.display = 'flex';
+                        $badge.textContent = data.total;
+
+                        // Play sound if count increased
+                        if (data.total > lastNotifCount) {
+                            notifSound.play().catch(() => { });
+                        }
+                    } else {
+                        $badge.style.display = 'none';
+                    }
+                    lastNotifCount = data.total;
+                });
+        }
+
+        // Initial check and then every 15 seconds
+        checkNotifications();
+        setInterval(checkNotifications, 15000);
     </script>
     @stack('scripts')
 </body>

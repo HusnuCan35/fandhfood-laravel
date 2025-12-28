@@ -11,36 +11,37 @@
         <p class="text-muted mb-0">Hoş geldiniz, masanıza lezzet getirelim!</p>
     </div>
 
-<!-- Active Orders Status -->
-<div id="liveOrderContainer" style="{{ $activeOrders->count() > 0 ? '' : 'display:none;' }}">
-    <div class="menu-section">
-        <h2 class="section-title">Canlı Sipariş Takibi</h2>
-        <div id="orderList">
-            @foreach($activeOrders as $order)
-            <div class="order-status-card animate__animated animate__fadeIn" id="order-{{ $order->id }}">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span style="font-weight: 700; font-size: 0.9rem;">Sipariş #{{ $order->id }}</span>
-                    <span class="badge badge-pill badge-light time-ago">{{ $order->created_at->diffForHumans() }}</span>
-                </div>
-                <div class="status-steps">
-                    <div class="step step-1 {{ $order->order_status == 'pending' ? 'active' : 'completed' }}">
-                        <div class="step-icon"><i class="las la-check"></i></div>
-                        <div class="step-label">Alındı</div>
+    <!-- Active Orders Status -->
+    <div id="liveOrderContainer" style="{{ $activeOrders->count() > 0 ? '' : 'display:none;' }}">
+        <div class="menu-section">
+            <h2 class="section-title">Canlı Sipariş Takibi</h2>
+            <div id="orderList">
+                @foreach($activeOrders as $order)
+                    <div class="order-status-card animate__animated animate__fadeIn" id="order-{{ $order->id }}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span style="font-weight: 700; font-size: 0.9rem;">Sipariş #{{ $order->id }}</span>
+                            <span class="badge badge-pill badge-light time-ago">{{ $order->created_at->diffForHumans() }}</span>
+                        </div>
+                        <div class="status-steps">
+                            <div class="step step-1 {{ $order->order_status == 'pending' ? 'active' : 'completed' }}">
+                                <div class="step-icon"><i class="las la-check"></i></div>
+                                <div class="step-label">Alındı</div>
+                            </div>
+                            <div
+                                class="step step-2 {{ $order->order_status == 'preparing' ? 'active' : ($order->order_status == 'ready' ? 'completed' : '') }}">
+                                <div class="step-icon"><i class="las la-utensils"></i></div>
+                                <div class="step-label">Hazırlanıyor</div>
+                            </div>
+                            <div class="step step-3 {{ $order->order_status == 'ready' ? 'active' : '' }}">
+                                <div class="step-icon"><i class="las la-bell"></i></div>
+                                <div class="step-label">Hazır</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="step step-2 {{ $order->order_status == 'preparing' ? 'active' : ($order->order_status == 'ready' ? 'completed' : '') }}">
-                        <div class="step-icon"><i class="las la-utensils"></i></div>
-                        <div class="step-label">Hazırlanıyor</div>
-                    </div>
-                    <div class="step step-3 {{ $order->order_status == 'ready' ? 'active' : '' }}">
-                        <div class="step-icon"><i class="las la-bell"></i></div>
-                        <div class="step-label">Hazır</div>
-                    </div>
-                </div>
+                @endforeach
             </div>
-            @endforeach
         </div>
     </div>
-</div>
 
     <!-- Search Bar -->
     <div class="search-container animate__animated animate__fadeInUp">
@@ -69,7 +70,12 @@
                     <h2 class="section-title">{{ $category->category_name }}</h2>
                     @foreach($category->products as $product)
                         <div class="product-card animate__animated animate__fadeInUp"
-                            data-name="{{ strtolower($product->product_name) }}" data-category="{{ $category->category_name }}">
+                            data-name="{{ strtolower($product->product_name) }}" data-category="{{ $category->category_name }}"
+                            data-id="{{ $product->id }}" data-image="{{ $product->product_image }}"
+                            data-title="{{ $product->product_name }}" data-desc="{{ $product->product_description }}"
+                            data-price="{{ number_format($product->product_price, 2) }}"
+                            data-allergens='@json($product->allergens->map(fn($a) => ["name" => $a->name, "icon" => $a->icon]))'
+                            onclick="openProductModal(this)">
                             <img src="{{ $product->product_image }}" class="product-image" alt="{{ $product->product_name }}">
                             <div class="product-details">
                                 <div>
@@ -87,7 +93,8 @@
                                 </div>
                                 <div class="p-footer">
                                     <span class="p-price">{{ number_format($product->product_price, 2) }} ₺</span>
-                                    <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }})">
+                                    <button class="add-to-cart-btn"
+                                        onclick="event.stopPropagation(); addToCart({{ $product->id }}, this)">
                                         <i class="las la-plus"></i>
                                     </button>
                                 </div>
@@ -188,7 +195,7 @@
             });
         });
 
-        function addToCart(productId) {
+        function addToCart(productId, btnElement) {
             fetch('{{ route("qrmenu.cart.add") }}', {
                 method: 'POST',
                 headers: {
@@ -200,12 +207,12 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        updateCartUI(data);
+                        updateCartUI(data, btnElement);
                     }
                 });
         }
 
-        function updateCartUI(data) {
+        function updateCartUI(data, btnElement) {
             // UI updates for counts and totals
             $('#cartBadge').text(data.cartCount);
             $('#cartTotal').text(formatMoney(data.total));
@@ -218,14 +225,19 @@
             }
 
             // Animated feedback
-            let $btn = event.target.tagName === 'I' ? $(event.target).parent() : $(event.target);
-            $btn.addClass('animate__animated animate__pulse');
-            setTimeout(() => $btn.removeClass('animate__animated animate__pulse'), 500);
+            if (btnElement) {
+                let $btn = $(btnElement).closest('.add-to-cart-btn');
+                if (!$btn.length) $btn = $(btnElement);
+                $btn.addClass('pulse-animation');
+                setTimeout(() => $btn.removeClass('pulse-animation'), 300);
+            }
 
-            // Ideally here you'd re-fetch cart_items partial instead of reload
-            // For rapid dev we can do a reload or better, a partial refresh
-            // Let's do a quiet reload without page flash if possible or just location.reload() for now
-            location.reload();
+            // Pulse the cart badge
+            $('#cartBadge').addClass('pulse-animation');
+            setTimeout(() => $('#cartBadge').removeClass('pulse-animation'), 300);
+
+            // Reload to update cart items display (could be improved with AJAX partial)
+            setTimeout(() => location.reload(), 400);
         }
 
         function formatMoney(amount) {
@@ -241,59 +253,89 @@
                 },
                 body: JSON.stringify({ type: type })
             })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-            });
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                });
         }
 
         // Real-time Status Polling
         function refreshOrderStatus() {
             fetch('{{ route("qrmenu.orders.status") }}')
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    if(data.orders.length > 0) {
-                        $('#liveOrderContainer').show();
-                        
-                        data.orders.forEach(order => {
-                            let $card = $(`#order-${order.id}`);
-                            if($card.length > 0) {
-                                // Update existing card status
-                                $card.find('.time-ago').text(order.time);
-                                
-                                let $s1 = $card.find('.step-1');
-                                let $s2 = $card.find('.step-2');
-                                let $s3 = $card.find('.step-3');
-                                
-                                // Reset classes
-                                $s1.removeClass('active completed');
-                                $s2.removeClass('active completed');
-                                $s3.removeClass('active completed');
-                                
-                                if(order.status === 'pending') {
-                                    $s1.addClass('active');
-                                } else if(order.status === 'preparing') {
-                                    $s1.addClass('completed');
-                                    $s2.addClass('active');
-                                } else if(order.status === 'ready') {
-                                    $s1.addClass('completed');
-                                    $s2.addClass('completed');
-                                    $s3.addClass('active');
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.orders.length > 0) {
+                            $('#liveOrderContainer').show();
+
+                            data.orders.forEach(order => {
+                                let $card = $(`#order-${order.id}`);
+                                if ($card.length > 0) {
+                                    // Update existing card status
+                                    $card.find('.time-ago').text(order.time);
+
+                                    let $s1 = $card.find('.step-1');
+                                    let $s2 = $card.find('.step-2');
+                                    let $s3 = $card.find('.step-3');
+
+                                    // Reset classes
+                                    $s1.removeClass('active completed');
+                                    $s2.removeClass('active completed');
+                                    $s3.removeClass('active completed');
+
+                                    if (order.status === 'pending') {
+                                        $s1.addClass('active');
+                                    } else if (order.status === 'preparing') {
+                                        $s1.addClass('completed');
+                                        $s2.addClass('active');
+                                    } else if (order.status === 'ready') {
+                                        $s1.addClass('completed');
+                                        $s2.addClass('completed');
+                                        $s3.addClass('active');
+                                    }
+                                } else {
+                                    // If a new order appeared (unlikely in this flow, but good for robust UX)
+                                    location.reload();
                                 }
-                            } else {
-                                // If a new order appeared (unlikely in this flow, but good for robust UX)
-                                location.reload(); 
-                            }
-                        });
-                    } else {
-                        $('#liveOrderContainer').hide();
+                            });
+                        } else {
+                            $('#liveOrderContainer').hide();
+                        }
                     }
-                }
-            });
+                });
         }
 
         // Start polling every 10 seconds
         setInterval(refreshOrderStatus, 10000);
+
+        // --- Product Detail Modal ---
+        let currentProductId = null;
+
+        function openProductModal(cardElement) {
+            const $card = $(cardElement);
+            currentProductId = $card.data('id');
+
+            $('#modalProductImage').attr('src', $card.data('image'));
+            $('#modalProductName').text($card.data('title'));
+            $('#modalProductDesc').text($card.data('desc'));
+            $('#modalProductPrice').text($card.data('price') + ' ₺');
+
+            // Allergens
+            const allergens = $card.data('allergens') || [];
+            let allergensHtml = '';
+            allergens.forEach(a => {
+                allergensHtml += `<span class="allergen-badge"><i class="${a.icon}"></i> ${a.name}</span>`;
+            });
+            $('#modalAllergens').html(allergensHtml);
+
+            $('#productDetailModal').modal('show');
+        }
+
+        $('#modalAddToCart').on('click', function () {
+            if (currentProductId) {
+                addToCart(currentProductId, this);
+                $('#productDetailModal').modal('hide');
+            }
+        });
     </script>
 @endpush
