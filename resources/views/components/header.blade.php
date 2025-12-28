@@ -1,5 +1,12 @@
 <header class="header">
-    <a href="{{ route('home') }}" class="logo">FandhFood</a>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="{{ route('home') }}" class="logo">FandhFood</a>
+        @if(session('table_id') && $tableName = \App\Models\Table::find(session('table_id'))?->name)
+            <span style="background: var(--main-color); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                <i class="las la-chair"></i> {{ $tableName }}
+            </span>
+        @endif
+    </div>
 
     <div class="header-navigation">
         <div class="header-button button-cart" style="position: relative;">

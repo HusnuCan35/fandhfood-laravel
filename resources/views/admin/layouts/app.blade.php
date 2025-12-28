@@ -555,6 +555,21 @@
                         <i class="las la-users"></i>
                         <span>Kullanıcılar</span>
                     </a>
+                    <a href="{{ route('admin.tables.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.tables.*') ? 'active' : '' }}">
+                        <i class="las la-chair"></i>
+                        <span>Masalar</span>
+                    </a>
+                    <a href="{{ route('admin.allergens.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.allergens.*') ? 'active' : '' }}">
+                        <i class="las la-exclamation-triangle"></i>
+                        <span>Alerjenler</span>
+                    </a>
+                    <a href="{{ route('admin.calls.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.calls.index') ? 'active' : '' }}">
+                        <i class="las la-bell-slash"></i>
+                        <span>Masa Talepleri</span>
+                    </a>
                 </div>
 
                 <div class="nav-section">

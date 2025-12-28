@@ -20,7 +20,7 @@
                 <span>Profilim</span>
             </a>
 
-            <a href="{{ route('profile') }}#orders" class="sidebar-link">
+            <a href="{{ route('profile') }}#orders" class="sidebar-link" onclick="closeSidebar()">
                 <i class="las la-shopping-bag"></i>
                 <span>Siparişlerim</span>
             </a>

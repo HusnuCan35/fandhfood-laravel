@@ -359,6 +359,7 @@ class CartController extends Controller
 
         // Create order
         $order = \App\Models\Order::create([
+            'table_id' => session('table_id'),
             'user_id' => $user->id,
             'order_total' => $orderTotal,
             'discount_details' => $discountDetails,

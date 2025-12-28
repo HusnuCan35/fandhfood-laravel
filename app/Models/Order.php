@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     protected $fillable = [
+        'table_id',
         'user_id',
         'order_total',
         'discount_details',
@@ -26,6 +27,14 @@ class Order extends Model
         'delivery_date',
         'delivery_hour',
     ];
+
+    /**
+     * Get the table associated with the order.
+     */
+    public function table(): BelongsTo
+    {
+        return $this->belongsTo(Table::class);
+    }
 
     protected $casts = [
         'order_total' => 'decimal:2',

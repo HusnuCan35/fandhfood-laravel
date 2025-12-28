@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Allergen;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -21,7 +22,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.products.form', compact('categories'));
+        $allergens = Allergen::all();
+        return view('admin.products.form', compact('categories', 'allergens'));
     }
 
     public function store(Request $request)
@@ -38,7 +40,11 @@ class ProductController extends Controller
 
         $validated['status'] = $request->has('status');
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        if ($request->has('allergens')) {
+            $product->allergens()->sync($request->allergens);
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Ürün başarıyla oluşturuldu!');
@@ -47,7 +53,8 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        return view('admin.products.form', compact('product', 'categories'));
+        $allergens = Allergen::all();
+        return view('admin.products.form', compact('product', 'categories', 'allergens'));
     }
 
     public function update(Request $request, Product $product)
@@ -65,6 +72,12 @@ class ProductController extends Controller
         $validated['status'] = $request->has('status');
 
         $product->update($validated);
+
+        if ($request->has('allergens')) {
+            $product->allergens()->sync($request->allergens);
+        } else {
+            $product->allergens()->detach();
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Ürün başarıyla güncellendi!');

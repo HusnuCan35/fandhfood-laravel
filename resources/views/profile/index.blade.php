@@ -155,7 +155,7 @@
             </div>
 
             <!-- Order History Section -->
-            <div class="profile-card orders-card">
+            <div class="profile-card orders-card" id="orders">
                 <div class="profile-card-header">
                     <i class="las la-shopping-bag"></i>
                     <h3>Sipariş Geçmişi</h3>

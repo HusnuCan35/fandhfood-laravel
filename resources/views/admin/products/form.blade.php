@@ -64,6 +64,20 @@
         </div>
 
         <div class="form-group">
+            <label class="form-label">Alerjenler</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                @foreach($allergens as $allergen)
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <input type="checkbox" name="allergens[]" value="{{ $allergen->id }}"
+                               {{ (isset($product) && $product->allergens->contains($allergen->id)) ? 'checked' : '' }}>
+                        <i class="{{ $allergen->icon }}" style="color: var(--admin-primary);"></i>
+                        {{ $allergen->name }}
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="form-group">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                 <input type="checkbox" name="status" value="1" 
                        {{ old('status', $product->status ?? true) ? 'checked' : '' }}

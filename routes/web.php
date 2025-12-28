@@ -79,4 +79,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::post('users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
     Route::resource('coupons', AdminCouponController::class)->except(['create', 'edit', 'show']);
     Route::resource('campaigns', AdminCampaignController::class)->except(['create', 'edit', 'show']);
+    Route::resource('tables', \App\Http\Controllers\Admin\TableController::class);
+    Route::resource('allergens', \App\Http\Controllers\Admin\AllergenController::class);
+
+    Route::get('/calls', [\App\Http\Controllers\Admin\CallController::class, 'index'])->name('calls.index');
+    Route::post('/calls/{call}/complete', [\App\Http\Controllers\Admin\CallController::class, 'complete'])->name('calls.complete');
+});
+
+// QR Menu Routes
+Route::prefix('menu')->group(function () {
+    Route::get('/table/{table}', [\App\Http\Controllers\QrMenuController::class, 'index'])->name('qrmenu.index');
+    Route::post('/cart/add', [\App\Http\Controllers\QrMenuController::class, 'addToCart'])->name('qrmenu.cart.add');
+    Route::post('/cart/remove', [\App\Http\Controllers\QrMenuController::class, 'removeFromCart'])->name('qrmenu.cart.remove');
+    Route::post('/order/place', [\App\Http\Controllers\QrMenuController::class, 'placeOrder'])->name('qrmenu.order.place');
+    Route::post('/call-waiter', [\App\Http\Controllers\QrMenuController::class, 'callWaiter'])->name('qrmenu.call');
+    Route::get('/orders/status', [\App\Http\Controllers\QrMenuController::class, 'getOrderStatus'])->name('qrmenu.orders.status');
 });

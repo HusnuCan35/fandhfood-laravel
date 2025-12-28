@@ -28,6 +28,11 @@ class Product extends Model
     /**
      * Get the category that owns the product.
      */
+    public function allergens()
+    {
+        return $this->belongsToMany(Allergen::class, 'product_allergen');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

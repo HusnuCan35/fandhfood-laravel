@@ -14,8 +14,13 @@ class HomeController extends Controller
     /**
      * Show the homepage.
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Capture Table ID if present
+        if ($request->has('table')) {
+            return redirect()->route('qrmenu.index', ['table' => $request->table]);
+        }
+
         // Get enabled modules
         $modules = Module::pluck('module_status', 'module_name')->toArray();
 

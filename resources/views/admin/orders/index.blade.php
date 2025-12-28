@@ -41,6 +41,14 @@
                         <td>
                             <strong>{{ $order->user->name ?? 'Bilinmiyor' }}</strong>
                             <p style="font-size: 0.85rem; color: var(--admin-text-light);">{{ $order->phone }}</p>
+                            @if($order->table)
+                                <div style="margin-top: 5px;">
+                                    <span class="badge badge-info"
+                                        style="background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">
+                                        <i class="las la-chair"></i> {{ $order->table->name }}
+                                    </span>
+                                </div>
+                            @endif
                         </td>
                         <td>
                             @foreach($order->items->take(2) as $item)
